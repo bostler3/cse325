@@ -1,0 +1,129 @@
+Evidence from the end of the module Create a web API with ASP.NET Core controllers showing the existing content, and your additional record.
+_________________________________________________
+
+ContosoPizza.http
+@ContosoPizza_HostAddress = http://localhost:5235
+
+GET {{ContosoPizza_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{ContosoPizza_HostAddress}}/pizza/
+Accept: application/json
+
+###
+
+GET {{ContosoPizza_HostAddress}}/pizza/5
+Accept: application/json
+
+###
+
+POST {{ContosoPizza_HostAddress}}/pizza/
+Content-Type: application/json
+
+{
+    "name": "Hawaii",
+    "isGlutenFree": false
+}
+
+###
+
+PUT {{ContosoPizza_HostAddress}}/pizza/3
+Content-Type: application/json
+
+{
+    "id": 3,
+    "name": "Hawaiian",
+    "isGlutenFree": false
+}
+
+###
+
+DELETE {{ContosoPizza_HostAddress}}/pizza/3
+
+###
+
+POST {{ContosoPizza_HostAddress}}/pizza/
+Content-Type: application/json
+
+{
+    "name": "Plain Cheese",
+    "isGlutenFree": false
+}
+
+###
+
+Response:
+HTTP/1.1 200 OK
+Connection: close
+Content-Type: application/json; charset=utf-8
+Date: Fri, 03 Jul 2026 02:44:59 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+[
+  {
+    "id": 1,
+    "name": "Classic Italian",
+    "isGlutenFree": false
+  },
+  {
+    "id": 2,
+    "name": "Veggie",
+    "isGlutenFree": true
+  },
+  {
+    "id": 4,
+    "name": "Hawaii",
+    "isGlutenFree": false
+  },
+  {
+    "id": 5,
+    "name": "Plain Cheese",
+    "isGlutenFree": false
+  }
+]
+
+A text copy of your working sales summary function for Part 2:
+
+string GenerateSalesSummaryReport()
+{
+    var salesTotalCurrency = salesTotal.ToString("C");
+    StringBuilder sb = new StringBuilder();
+    sb.Append("Sales Summary");
+    sb.AppendLine();
+    sb.Append("-----------------------------");
+    sb.AppendLine();
+    sb.Append($"Total Sales: {salesTotalCurrency}");
+    sb.AppendLine();
+    sb.AppendLine();
+    sb.Append("Details:");
+    sb.AppendLine();
+    // Using only the sales.json files and NOT salestotals.json files like I think the tutorial did
+    List<string> salesJsonFiles = new List<string>();
+    var foundSalesJsonFiles = Directory.EnumerateFiles(currentDirectory, "*", SearchOption.AllDirectories);
+    foreach (var file in foundSalesJsonFiles)
+    {
+        if (file.EndsWith("sales.json"))
+        {
+            salesJsonFiles.Add(file);
+        }
+    }
+
+    foreach (var file in salesJsonFiles)
+    {
+        FileInfo info = new FileInfo(file);
+        string fullFileName = info.FullName;
+        // Got help from a Bing search for: "remove a part of a string in c#"
+        string displayFileName = fullFileName.Remove(0, 24);
+        string salesJson = File.ReadAllText(file);
+        SalesData? data = JsonConvert.DeserializeObject<SalesData?>(salesJson);
+        double sales = data?.Total ?? 0;
+        var salesCurrency = sales.ToString("C");
+        sb.Append($"  {displayFileName}: {salesCurrency}");
+        sb.AppendLine();
+    }
+    string result = sb.ToString();
+    return result;
+}
