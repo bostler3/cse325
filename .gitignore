@@ -1,0 +1,50 @@
+# Got this from Copilot
+
+# Build output
+bin/
+obj/
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Publish output
+publish/
+out/
+
+# ASP.NET / Razor
+wwwroot/lib/
+wwwroot/node_modules/
+
+# Entity Framework
+Migrations/
+
+# Configuration
+appsettings.Development.json
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Dotnet secrets
+secrets.json
+
+# Node (if your Razor project uses npm)
+node_modules/
+
+# Environment variables
+.env
