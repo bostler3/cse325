@@ -51,6 +51,30 @@ public static class SeedData
                     Genre = "Western",
                     Rating = "PG",
                     Price = 3.99M
+                },
+                new Movie
+                {
+                    Title = "The Princess Bride",
+                    ReleaseDate = DateTime.Parse("1987-1-1"),
+                    Genre = "Adventure",
+                    Rating = "PG",
+                    Price = 5.99M
+                },
+                new Movie
+                {
+                    Title = "Back to the Future",
+                    ReleaseDate = DateTime.Parse("1985-1-1"),
+                    Genre = "Adventure",
+                    Rating = "PG",
+                    Price = 4.99M
+                },
+                new Movie
+                {
+                    Title = "The Breadwinner",
+                    ReleaseDate = DateTime.Parse("2026-3-1"),
+                    Genre = "Comedy",
+                    Rating = "PG",
+                    Price = 8.99M
                 }
             );
             context.SaveChanges();
