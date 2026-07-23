@@ -1,0 +1,130 @@
+@using System.Drawing
+@using System.Linq.Expressions
+@inject GameState State
+<HeadContent>
+    <style>
+        :root {
+            --board-bg: @ColorTranslator.ToHtml(BoardColor);  /** the color of the board **/
+            --player1: @ColorTranslator.ToHtml(Player1Color);      /** Player 1's piece color **/
+            --player2: @ColorTranslator.ToHtml(Player2Color);     /** Player 2's piece color **/
+        }
+    </style>
+</HeadContent>
+<article>
+    @winnerMessage  <button style="@ResetStyle" @onclick="ResetGame">Reset the game</button>
+    <br />
+    <span class="alert-danger">@errorMessage</span>
+    <span class="alert-info">@CurrentTurn</span>
+</article>
+<nav>
+    @for (byte i = 0; i < 7; i++)
+    {
+        var col = i;
+        <span title="Click to play a piece" @onclick="() => PlayPiece(col)">🔽</span>
+    }
+</nav>
+<div>
+   <div class="board">
+      @for (var i = 0; i < 42; i++)
+      {
+         <span class="container">
+            <span></span>
+         </span>
+      }
+   </div>
+   @for (var i = 0; i < 42; i++)
+    {
+        <span class="@pieces[i]"></span>
+    }
+</div>
+<div id="playermoves">
+    <div id="player1moves">
+        <p class="moves-heading">Player 1 Moves</p>
+        <ol class="playermovesol">
+            @foreach (var move in player1moves)
+            {
+                <li>@($"Column {move.Column} Row {move.Row}")</li>
+            }
+        </ol>
+    </div>
+    <div id="player2moves">
+        <p class="moves-heading">Player 2 Moves</p>
+        <ol class="playermovesol">
+            @foreach (var move in player2moves)
+            {
+                <li>@($"Column {move.Column} Row {move.Row}")</li>
+            }
+        </ol>
+    </div>
+</div>
+
+@code {
+    private string[] pieces = new string[42];
+    private string winnerMessage = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private string CurrentTurn => (winnerMessage == string.Empty) ? $"Player {State.PlayerTurn}'s Turn" : "";
+    private string ResetStyle => (winnerMessage == string.Empty) ? "display: none;" : "";
+    // Got help from a Bing search for "create list of objects in c#"
+    private class Move
+    {
+        public int Player {get; set;}
+        public int Column {get; set;}
+        public int Row {get; set;}
+    }
+    private List<Move> player1moves = new List<Move>();
+    private List<Move> player2moves = new List<Move>();
+    private void PlayPiece(byte col)
+    {
+        errorMessage = string.Empty;
+        try
+        {
+            var player = State.PlayerTurn;
+            var turn = State.CurrentTurn;
+            var landingRow = State.PlayPiece(col);
+            pieces[turn] = $"player{player} col{col} drop{landingRow}";
+            // Got help from a Bing search for "add new object to list c#"
+            if (player == 1)
+            {
+                player1moves.Add(new Move {Player = player, Column = col + 1, Row = landingRow});
+            } else {
+                player2moves.Add(new Move {Player = player, Column = col + 1, Row = landingRow});
+            }
+        }
+        catch (ArgumentException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        winnerMessage = State.CheckForWin() switch
+        {
+            GameState.WinState.Player1_Wins => "Player 1 Wins!",
+            GameState.WinState.Player2_Wins => "Player 2 Wins!",
+            GameState.WinState.Tie => "It's a tie!",
+            _ => ""
+        };
+    }
+
+    void ResetGame()
+    {
+        State.ResetBoard();
+        winnerMessage = string.Empty;
+        errorMessage = string.Empty;
+        pieces = new string[42];
+        // Got help from a Bing search for "clear a list of objects in c#"
+        player1moves.Clear();
+        player2moves.Clear();
+    }
+    [Parameter]
+    public Color BoardColor { get; set; } = ColorTranslator.FromHtml("yellow");
+
+    [Parameter]
+    public Color Player1Color { get; set; } = ColorTranslator.FromHtml("red");
+
+    [Parameter]
+    public Color Player2Color { get; set; } = ColorTranslator.FromHtml("blue");
+
+    protected override void OnInitialized()
+    {
+        State.ResetBoard();
+    }
+}
